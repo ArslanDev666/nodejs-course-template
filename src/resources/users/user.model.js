@@ -17,6 +17,15 @@ class User {
     const { id, name, login } = user;
     return { id, name, login };
   }
+
+  toJSON() {
+    return {
+      name: this.name,
+      id: this.id,
+      login: this.login,
+      password: this.password
+    };
+  }
 }
 
 module.exports = User;
