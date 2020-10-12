@@ -13,9 +13,7 @@ const createTask = async (data, boardId) => {
 };
 
 const getTaskById = async (boardId, taskId) =>
-  DB.filter(task => task.boardId === boardId).filter(
-    task => task.id === taskId
-  )[0];
+  DB.filter(task => task.boardId === boardId).find(task => task.id === taskId);
 
 const updateTaskById = async (boardId, taskId, data) => {
   const updateTaskIdx = DB.findIndex(
