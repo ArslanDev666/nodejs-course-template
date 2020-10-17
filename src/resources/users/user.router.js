@@ -2,38 +2,79 @@ const router = require('express').Router();
 const taskService = require('../task/task.service');
 const User = require('./user.model');
 const usersService = require('./user.service');
+const morganTokens = require('../../common/morgan-tokens');
+const logger = require('../../common/logger');
 
-router.get('/', async (req, res) => {
-  const users = await usersService.getAll();
-  res.json(users.map(User.toResponse));
+router.get('/', morganTokens.users, async (req, res) => {
+  try {
+    const users = await usersService.getAll();
+    res.status(200).send(users.map(User.toResponse));
+  } catch (error) {
+    logger.error(error.stack);
+  }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', morganTokens.users, async (req, res) => {
   const { id } = req.params;
-  const user = await usersService.getById(id);
-  res.json(User.toResponse(user));
+  try {
+    const user = await usersService.getById(id);
+
+    if (user) {
+      res.status(200).send(User.toResponse(user));
+    } else {
+      res.status(404).send('Not Found');
+      logger.log({
+        level: 'error',
+        message: `Method: ${req.method} - Status: 404 - Error: User Not Found! - id: ${id}, Url: ${req.originalUrl}\n`
+      });
+    }
+  } catch (error) {
+    logger.error(error.stack);
+  }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', morganTokens.users, async (req, res) => {
+  try {
+    const data = req.body;
+    const user = await usersService.createUser(data);
+    res.status(200).send(User.toResponse(user));
+  } catch (error) {
+    logger.error(error.stack);
+  }
+});
+
+router.put('/:id', morganTokens.users, async (req, res) => {
+  const { id } = req.params;
   const data = req.body;
-  const user = await usersService.createUser(data);
-
-  res.json(User.toResponse(user));
+  try {
+    const user = await usersService.updateById(id, data);
+    if (user) {
+      res.status(200).send(User.toResponse(user));
+    } else {
+      res.status(404).send('Not Found');
+      logger.log({
+        level: 'error',
+        message: `Method: ${req.method} - Status: 404 - Error: User Not Found! - id: ${id}, Url: ${req.originalUrl}\n`
+      });
+    }
+  } catch (error) {
+    logger.error(error.stack);
+  }
 });
 
-router.put('/:id', async (req, res) => {
+router.delete('/:id', morganTokens.users, async (req, res) => {
   const { id } = req.params;
-  const data = req.body;
-  const user = await usersService.updateById(id, data);
-
-  res.json(User.toResponse(user));
-});
-
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-  await usersService.deleteById(id);
-  await taskService.deleteUserId(id);
-  res.json('delete complete');
+  try {
+    await usersService.deleteById(id);
+    await taskService.deleteUserId(id);
+    res.status(204).send('delete complete');
+  } catch (error) {
+    res.status(404).send('User not found');
+    logger.log({
+      level: 'error',
+      message: `Method: ${req.method} - Status: 404 - Error: User Not Found! - id: ${id}, Url: ${req.originalUrl}\n`
+    });
+  }
 });
 
 module.exports = router;
