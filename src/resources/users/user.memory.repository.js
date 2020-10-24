@@ -1,22 +1,20 @@
 /* eslint-disable no-sync */
 const User = require('./user.model');
-const DB = require('../../data/DB').users;
 
-const getAll = async () => DB;
+const getAll = async () => User.find();
 
-const getById = async id => DB.find(cur => cur.id === id);
+const getById = async id => User.findById(id);
 
 const createUser = async data => {
-  const user = new User(data).toJSON();
-  DB.push(user);
-  return getById(user.id);
+  const user = new User(data);
+  await user.save();
+  return getById(user._id);
 };
 
 const updateById = async (id, user) => {
-  const idx = DB.findIndex(cur => cur.id === id);
-  DB[idx] = { ...user };
+  await User.findByIdAndUpdate(id, user);
   return getById(id);
 };
-const deleteById = async id => DB.filter(cur => cur.id !== id);
+const deleteById = async id => User.deleteOne({ id });
 
 module.exports = { getAll, getById, createUser, updateById, deleteById };

@@ -1,34 +1,40 @@
-const uuid = require('uuid');
-class Task {
-  constructor({
-    id = uuid(),
-    title = 'title',
-    description = 'description',
-    userId = 'userId',
-    order = 0,
-    boardId = 'string',
-    columnId = 'string'
-  } = {}) {
-    this.id = id;
-    this.title = title;
-    this.description = description;
-    this.userId = userId;
-    this.order = order;
-    this.boardId = boardId;
-    this.columnId = columnId;
-  }
+const { Schema, model } = require('mongoose');
 
-  toJSON() {
-    return {
-      id: this.id,
-      title: this.title,
-      description: this.description,
-      userId: this.userId,
-      order: this.order,
-      boardId: this.boardId,
-      columnId: this.columnId
-    };
+const Task = new Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  userId: {
+    type: Schema.Types.ObjectId
+  },
+  boardId: {
+    type: Schema.Types.ObjectId,
+    required: true
+  },
+  columnId: {
+    type: Schema.Types.ObjectId
+  },
+  order: {
+    type: Number,
+    required: true
   }
-}
+});
 
-module.exports = Task;
+Task.statics.toResponse = ({
+  _id,
+  title,
+  description,
+  userId,
+  boardId,
+  columnId,
+  order
+}) => {
+  return { id: _id, title, description, userId, boardId, columnId, order };
+};
+
+module.exports = model('Task', Task);
