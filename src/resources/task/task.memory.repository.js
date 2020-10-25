@@ -1,54 +1,32 @@
 /* eslint-disable no-sync */
-const DB = require('../../data/DB').tasks;
-
 const Task = require('./task.model');
 
-const getAllByBoardId = boardId => DB.filter(task => task.boardId === boardId);
+const getAllByBoardId = async boardId => Task.find({ boardId });
 
 const createTask = async (data, boardId) => {
-  const task = new Task(data).toJSON();
+  const task = new Task(data);
   task.boardId = boardId;
-  DB.push(task);
+  await task.save();
   return task;
 };
 
-const getTaskById = async (boardId, taskId) =>
-  DB.filter(task => task.boardId === boardId).find(task => task.id === taskId);
+const getTaskById = async (boardId, taskId) => {
+  const tasks = await Task.find({ boardId }).lean();
+  return tasks.filter(item => item._id.toString() === taskId)[0];
+};
 
 const updateTaskById = async (boardId, taskId, data) => {
-  const updateTaskIdx = DB.findIndex(
-    task => task.id === taskId && task.boardId === boardId
-  );
-  DB[updateTaskIdx] = { ...data };
-
-  return DB[updateTaskIdx];
+  await Task.findByIdAndUpdate(taskId, data);
+  return getTaskById(boardId, taskId);
 };
 
-const deleteTaskById = async (boardId, taskId) => {
-  const idx = DB.findIndex(task => task.id === taskId);
-  DB.splice(idx, 1);
-};
+const deleteTaskById = async (boardId, taskId) =>
+  Task.findByIdAndDelete(taskId);
 
 const deleteUserId = async userId =>
-  DB.map(task => {
-    if (task.userId === userId) {
-      task.userId = null;
-    }
-    return task;
-  });
+  Task.updateMany({ userId }, { $set: { userId: null } });
 
-const deleteBoardId = async boardId => {
-  const deleteItems = [];
-  DB.forEach(task => {
-    if (task.boardId === boardId) {
-      deleteItems.push(task);
-    }
-  });
-  deleteItems.forEach(item => {
-    const idx = DB.findIndex(task => task.id === item.id);
-    DB.splice(idx, 1);
-  });
-};
+const deleteBoardId = async boardId => Task.deleteMany({ boardId });
 
 module.exports = {
   getAllByBoardId,
