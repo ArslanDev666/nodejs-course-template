@@ -4,8 +4,9 @@ const taskService = require('../task/task.service');
 const logger = require('../../common/logger');
 const morganTokens = require('../../common/morgan-tokens');
 const Board = require('./board.model');
+const authenticateJWT = require('../../common/authenticateJWT');
 
-router.get('/', morganTokens.board, async (req, res) => {
+router.get('/', morganTokens.board, authenticateJWT, async (req, res) => {
   try {
     const boards = await boardService.getAll();
     if (boards.length > 0) {
@@ -18,7 +19,7 @@ router.get('/', morganTokens.board, async (req, res) => {
     res.status(500).send('wrong error');
   }
 });
-router.get('/:id', morganTokens.board, async (req, res) => {
+router.get('/:id', morganTokens.board, authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
     const board = await boardService.getById(id);
@@ -36,7 +37,7 @@ router.get('/:id', morganTokens.board, async (req, res) => {
     res.status(500).send('wrong error');
   }
 });
-router.post('/', morganTokens.board, async (req, res) => {
+router.post('/', morganTokens.board, authenticateJWT, async (req, res) => {
   const data = req.body;
   try {
     const board = await boardService.createBoard(data);
@@ -46,7 +47,7 @@ router.post('/', morganTokens.board, async (req, res) => {
     res.status(500).send('wrong error');
   }
 });
-router.put('/:id', morganTokens.board, async (req, res) => {
+router.put('/:id', morganTokens.board, authenticateJWT, async (req, res) => {
   const { id } = req.params;
   const data = req.body;
   try {
@@ -65,8 +66,7 @@ router.put('/:id', morganTokens.board, async (req, res) => {
     res.status(500).send('wrong error');
   }
 });
-
-router.delete('/:id', morganTokens.board, async (req, res) => {
+router.delete('/:id', morganTokens.board, authenticateJWT, async (req, res) => {
   const { id } = req.params;
 
   try {

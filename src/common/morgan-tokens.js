@@ -25,5 +25,6 @@ morgan.token('getInfo', req => {
 const users = morgan(':getUser', { stream: logger.stream });
 const board = morgan(':getInfo', { stream: logger.stream });
 const tasks = morgan(':getInfo', { stream: logger.stream });
+const login = morgan(':getInfo', { stream: logger.stream });
 
-module.exports = { users, board, tasks };
+module.exports = { users, board, tasks, login };
