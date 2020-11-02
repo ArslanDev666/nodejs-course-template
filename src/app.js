@@ -2,6 +2,7 @@ const express = require('express');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/board/board.router');
 const taskRouter = require('./resources/task/task.router');
+const loginRouter = require('./resources/login/login.router');
 const swaggerUI = require('swagger-ui-express');
 const path = require('path');
 const YAML = require('yamljs');
@@ -22,6 +23,7 @@ app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use('/users', userRouter);
 app.use('/boards', boardRouter);
 app.use('/boards', taskRouter);
+app.use('/login', loginRouter);
 
 app.use((req, res) => {
   logger.error(`${404} - Page not Found - ${req.originalUrl} - ${req.method}`);

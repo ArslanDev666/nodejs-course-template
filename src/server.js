@@ -1,6 +1,7 @@
 const { PORT } = require('./common/config');
 const mongoose = require('mongoose');
 const app = require('./app');
+const usersRepo = require('./resources/users/user.memory.repository');
 
 async function start() {
   try {
@@ -9,7 +10,8 @@ async function start() {
       useFindAndModify: false,
       useUnifiedTopology: true
     });
-    app.listen(PORT, () => {
+    await usersRepo.createUserAdmin();
+    app.listen(PORT, async () => {
       console.log('mongoDB connected');
       console.log(`App is running on http://localhost:${PORT}`);
     });

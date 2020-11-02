@@ -4,8 +4,9 @@ const User = require('./user.model');
 const usersService = require('./user.service');
 const morganTokens = require('../../common/morgan-tokens');
 const logger = require('../../common/logger');
+const authenticateJWT = require('../../common/authenticateJWT');
 
-router.get('/', morganTokens.users, async (req, res) => {
+router.get('/', morganTokens.users, authenticateJWT, async (req, res) => {
   try {
     const users = await usersService.getAll();
 
@@ -20,7 +21,7 @@ router.get('/', morganTokens.users, async (req, res) => {
   }
 });
 
-router.get('/:id', morganTokens.users, async (req, res) => {
+router.get('/:id', morganTokens.users, authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
     const user = await usersService.getById(id);
@@ -39,7 +40,7 @@ router.get('/:id', morganTokens.users, async (req, res) => {
   }
 });
 
-router.post('/', morganTokens.users, async (req, res) => {
+router.post('/', morganTokens.users, authenticateJWT, async (req, res) => {
   try {
     const data = req.body;
     const user = await usersService.createUser(data);
@@ -50,7 +51,7 @@ router.post('/', morganTokens.users, async (req, res) => {
   }
 });
 
-router.put('/:id', morganTokens.users, async (req, res) => {
+router.put('/:id', morganTokens.users, authenticateJWT, async (req, res) => {
   const { id } = req.params;
   const data = req.body;
   try {
@@ -70,7 +71,7 @@ router.put('/:id', morganTokens.users, async (req, res) => {
   }
 });
 
-router.delete('/:id', morganTokens.users, async (req, res) => {
+router.delete('/:id', morganTokens.users, authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
     await usersService.deleteById(id);
